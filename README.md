@@ -1,0 +1,3 @@
+# SlicerCleverSeg
+
+Read me 
