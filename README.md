@@ -3,7 +3,7 @@
 Semi-automatic segmentation of anatomical structures. 
 Requires inside and outside annotation.
 
-# Usage Example
+## Usage Example
 
 First, open 3DSlicer, open a sample MRI example as in the tumor in the example.
 Open de Editor and mark inside and outside spots as in the Figure:
@@ -17,12 +17,12 @@ The results achived is shown in the Figure:
 
 Now you can go back and edit seeds by pressing S or edit the segmentation results using the eraser tool.
 
-# Publication
+## Publication
 
 Will be available soon as:
 
 **Fast and smart segmentation of paraspinal muscles in magnetic resonance imaging with CleverSeg**. *Symposium on Graphics Patterns and Images* (SIBGRAPI2019)
 
-# More details
+## More details
 
 Available soon
