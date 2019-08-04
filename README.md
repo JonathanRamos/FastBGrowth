@@ -1,13 +1,7 @@
 # CleverSeg
 
 Semi-automatic segmentation of anatomical structures. 
-Requires inside and outside annotation
-
-# Publication
-
-Will be available soon
-
-**Fast and smart segmentation of paraspinal muscles in magnetic resonance imaging with CleverSeg**. *Symposium on Graphics Patterns and Images* (SIBGRAPI2019)
+Requires inside and outside annotation.
 
 # Usage Example
 
@@ -22,6 +16,12 @@ The results achived is shown in the Figure:
 ![Screenshot03](https://user-images.githubusercontent.com/3834596/62427872-1bf4ed80-b6d0-11e9-886b-043391471ff4.jpg)
 
 Now you can go back and edit seeds by pressing S or edit the segmentation results using the eraser tool.
+
+# Publication
+
+Will be available soon as:
+
+**Fast and smart segmentation of paraspinal muscles in magnetic resonance imaging with CleverSeg**. *Symposium on Graphics Patterns and Images* (SIBGRAPI2019)
 
 # More details
 
