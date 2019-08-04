@@ -59,10 +59,11 @@ void vtkCleverSeg::RunCS(){
     QProgressBar* computationProgressBar =  new QProgressBar;
     qSlicerApplication::application()->mainWindow()->statusBar()->addPermanentWidget(computationProgressBar);
 
+	
     // Find ROI
     if(!InitializationFlag) {
         CS::FindVTKImageROI<LabPixelType>(SeedVol, m_imROI);
-        std::cout << "image ROI = [" << m_imROI[0] << "," << m_imROI[1] << "," << m_imROI[2] << ";"  \
+        std::cout << "Image ROI = [" << m_imROI[0] << "," << m_imROI[1] << "," << m_imROI[2] << ";"  \
                      << m_imROI[3] << "," << m_imROI[4] << "," << m_imROI[5] << "]" << std::endl;
 					 
         CS::ExtractVTKImageROI<SrcPixelType>(SourceVol, m_imROI, m_imSrcVec);
@@ -81,7 +82,7 @@ void vtkCleverSeg::RunCS(){
     m_fastGC->SetImageSize(imSize);
     m_fastGC->SetWorkMode(InitializationFlag);
 
-	cout << "Image info " << m_imSrcVec.size();
+	//cout << "Image info " << m_imSrcVec.size();
     // Do Segmentation
     m_fastGC->DoSegmentation();
     //m_fastGC->GetForegroundmage(m_imLabVec);
@@ -94,9 +95,9 @@ void vtkCleverSeg::RunCS(){
     timer.Stop();
 
     if(!InitializationFlag)
-        std::cout << "Initial CleverSeg segmentation time: " << timer.GetMean() << " seconds\n";
+        std::cout << "\n Initial CleverSeg segmentation time: " << timer.GetMean() << " seconds\n";
     else
-        std::cout << "Adaptive CleverSeg segmentation time: " << timer.GetMean() << " seconds\n";
+        std::cout << "\n Adaptive CleverSeg segmentation time: " << timer.GetMean() << " seconds\n";
 	
 }
 

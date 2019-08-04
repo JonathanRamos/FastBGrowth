@@ -64,13 +64,38 @@ void CleverSeg<SrcPixelType, LabPixelType>
 
 
 	// Determine neighborhood size at each vertice and Initilize seeds
+	m_NeighborIndexOffsets.clear();
 	for (k = -1; k <= 1; k++)
 		for (i = -1; i <= 1; i++)
 			for (j = -1; j <= 1; j++)
 				if (!(i == 0 && j == 0 && k == 0))
-					m_indOff.push_back( i + j * (int) m_DIMX + k * ( (int) m_DIMX * (int) m_DIMY ) );
+					m_NeighborIndexOffsets.push_back( i + j * (int) m_DIMX + k * ( (int) m_DIMX * (int) m_DIMY ) );
 
 	
+
+	// Determine neighborhood size for computation at each voxel.
+	// The neighborhood size is everywhere the same (size of m_NeighborIndexOffsets)
+	// except at the edges of the volume, where the neighborhood size is 0.
+	m_NumberOfNeighbors.resize(m_DIMXYZ);
+	const unsigned char numberOfNeighbors = m_NeighborIndexOffsets.size();
+	unsigned char* nbSizePtr = &(m_NumberOfNeighbors[0]);
+	for (int z = 0; z < m_DIMZ; z++)
+	{
+		bool zEdge = (z == 0 || z == m_DIMZ - 1);
+		for (int y = 0; y < m_DIMY; y++)
+		{
+			bool yEdge = (y == 0 || y == m_DIMY - 1);
+			*(nbSizePtr++) = 0; // x == 0 (there is always padding, so we don'neighborNewDistance need to check if m_DimX>0)
+			unsigned char nbSize = (zEdge || yEdge) ? 0 : numberOfNeighbors;
+			for (int x = m_DIMX - 2; x > 0; x--)
+			{
+				*(nbSizePtr++) = nbSize;
+			}
+			*(nbSizePtr++) = 0; // x == m_DimX-1 (there is always padding, so we don'neighborNewDistance need to check if m_DimX>1)
+		}
+	}
+
+
 	// Initialize weights
 	for (index = 0; index < m_DIMXYZ; index++) {
 		m_imLab[index] = m_imSeed[index];
@@ -84,36 +109,28 @@ template<typename SrcPixelType, typename LabPixelType>
 void CleverSeg<SrcPixelType, LabPixelType>
 ::CleverSegDefault() {
 	
-    float theta, C, g;
-    long idxCenter, i, j, k, cont = 0, maxIt = 999999;
-	float myDiff = 0;
-	long zinit, zend, idxNgbh;
+    float voxDiff, strength, weightDiff = 0;
+	const float theta = 0.01;
+    long idxCenter, idxNgbh, i, cont = 0;
+	const long maxIt = 999999;
 	bool converged = false;
 
 	while (!converged) {
 		converged = true;
-		for (k = 1; k < m_DIMZ; k++) {
+		for (idxCenter = 0; idxCenter < m_DIMXYZ; idxCenter++) { // for each voxel
+			if (m_imLab[idxCenter] != 0) { // Dont expand unlabelled voxel
+				unsigned char nbSize = m_NumberOfNeighbors[idxCenter]; // get number of neighbours
+				for (unsigned int i = 0; i < nbSize; i++) { // For each one of the neighbours 
+					idxNgbh = idxCenter + m_NeighborIndexOffsets[i]; // calculate neighbour index
 
-			for (j = 1; j < m_DIMY - 1; j++) {
-				for (i = 1; i < m_DIMX - 1; i++) {
-					idxCenter = i + j * m_DIMX + k * m_DIMXY;
+					voxDiff = ( maxC - std::abs(m_imSrc[idxCenter] - m_imSrc[idxNgbh]) ) / maxC; // calcule shifted/normalized voxel intensity difference
+					strength = (float) (voxDiff * m_imDist[idxCenter]); // calculate a new strength
+					weightDiff = (float) strength - m_imDist[idxNgbh];
 
-					if (m_imLab[idxCenter] != 0) {
-						
-						// Update neighbors
-						for (register int ii = 0; ii < 26; ii++) {
-							idxNgbh = idxCenter + m_indOff[ii];
-							C = ( maxC - std::abs(m_imSrc[idxCenter] - m_imSrc[idxNgbh]) ) / maxC;
-							theta = (float) ( C * m_imDist[idxCenter]);
-
-							if ((theta - m_imDist[idxNgbh]) > 0.01) {
-								m_imDist[idxNgbh] += theta;
-								m_imDist[idxNgbh] /= 2;
-								m_imLab[idxNgbh] = m_imLab[idxCenter];
-								// Keep iterating
-								converged = false;
-							}
-						}
+					if (weightDiff > theta) { // wont average if it only changes above the third/fourth decimal place
+						m_imDist[idxNgbh] = (m_imDist[idxNgbh] + strength)/2; // update weight
+						m_imLab[idxNgbh] = m_imLab[idxCenter]; // update label
+						converged = false; // Keep iterating
 					}
 				}
 			}

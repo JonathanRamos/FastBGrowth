@@ -46,8 +46,8 @@ private:
 
     std::vector<long> m_imSize;
     long m_DIMX, m_DIMY, m_DIMZ, m_DIMXY, m_DIMXYZ;
-    std::vector<int> m_indOff;
-    std::vector<unsigned char>  m_NBSIZE;
+	std::vector<long> m_NeighborIndexOffsets;
+	std::vector<unsigned char> m_NumberOfNeighbors;
 	float maxC;
 
  

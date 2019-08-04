@@ -287,82 +287,82 @@ class CleverSegEffectLogic(LabelEffect.LabelEffectLogic):
                 logging.warning('CleverSeg is cancelled by the user')
                 return
 
-            self.emergencyStopFunc = None
-            self.dialogBox = qt.QMessageBox()  # will display messages to draw users attention if he does anything wrong
-            self.dialogBox.setWindowTitle("CleverSeg Error")
-            self.dialogBox.setWindowModality(qt.Qt.NonModal)  # will allow user to continue interacting with Slicer
+        self.emergencyStopFunc = None
+        self.dialogBox = qt.QMessageBox()  # will display messages to draw users attention if he does anything wrong
+        self.dialogBox.setWindowTitle("CleverSeg Error")
+        self.dialogBox.setWindowModality(qt.Qt.NonModal)  # will allow user to continue interacting with Slicer
 
-            # TODO: check this claim- might be causing leaks
-            # set the image, label nodes (this will not change although the user can
-            # alter what is bgrnd/frgrnd in editor)
-            # Confused about how info propagates UIarray to UIVol, not the other way, NEEDS AUTO TESTS
-            self.labelNode = self.editUtil.getLabelVolume()  # labelLogic.GetVolumeNode()
-            self.backgroundNode = self.editUtil.getBackgroundVolume()  # backgroundLogic.GetVolumeNode()
+        # TODO: check this claim- might be causing leaks
+        # set the image, label nodes (this will not change although the user can
+        # alter what is bgrnd/frgrnd in editor)
+        # Confused about how info propagates UIarray to UIVol, not the other way, NEEDS AUTO TESTS
+        self.labelNode = self.editUtil.getLabelVolume()  # labelLogic.GetVolumeNode()
+        self.backgroundNode = self.editUtil.getBackgroundVolume()  # backgroundLogic.GetVolumeNode()
 
-            # perform safety check on right images/labels being selected, #set up images
-            # if red slice doesnt have a label or image, go no further
-            if type(self.backgroundNode) == type(None) or type(self.labelNode) == type(None):
-                self.dialogBox.setText("Either Image (must be Background Image) or Label not set in slice views.")
-                self.dialogBox.show()
+        # perform safety check on right images/labels being selected, #set up images
+        # if red slice doesnt have a label or image, go no further
+        if type(self.backgroundNode) == type(None) or type(self.labelNode) == type(None):
+            self.dialogBox.setText("Either Image (must be Background Image) or Label not set in slice views.")
+            self.dialogBox.show()
 
-                if self.emergencyStopFunc:
-                    self.emergencyStopFunc()
-                return
+            if self.emergencyStopFunc:
+                self.emergencyStopFunc()
+            return
 
-            volumesLogic = slicer.modules.volumes.logic()
+        volumesLogic = slicer.modules.volumes.logic()
 
-            self.labelName = self.labelNode.GetName()  # record name of label so user, cant trick us
-            self.imgName = self.backgroundNode.GetName()
+        self.labelName = self.labelNode.GetName()  # record name of label so user, cant trick us
+        self.imgName = self.backgroundNode.GetName()
 
-            if self.sliceViewMatchEditor(
-                    self.sliceLogic) == False:  # do nothing, exit function if user has played with images
-                if self.emergencyStopFunc:
-                    self.emergencyStopFunc()
-                return
+        if self.sliceViewMatchEditor(
+                self.sliceLogic) == False:  # do nothing, exit function if user has played with images
+            if self.emergencyStopFunc:
+                self.emergencyStopFunc()
+            return
 
-            # CleverSeg shortcuts
-            resetCS = qt.QKeySequence(qt.Qt.Key_R)  # reset initialization flag
-            runCS = qt.QKeySequence(qt.Qt.Key_C)  # run CleverSeg
-            editSeed = qt.QKeySequence(qt.Qt.Key_S)  # edit seed labels
+        # CleverSeg shortcuts
+        resetCS = qt.QKeySequence(qt.Qt.Key_R)  # reset initialization flag
+        runCS = qt.QKeySequence(qt.Qt.Key_C)  # run CleverSeg
+        editSeed = qt.QKeySequence(qt.Qt.Key_S)  # edit seed labels
 
-            print " keys for reset init = R, run CS = C, edit seed = S"
+        print " keys for reset init = R, run CS = C, edit seed = S"
 
-            self.qtkeyconnections = []
-            self.qtkeydefsCleverSeg = [[resetCS, self.resetCleverSegFlag],
-                                       [runCS, self.runCleverSeg],
-                                       [editSeed, self.editCleverSegSeed]]
+        self.qtkeyconnections = []
+        self.qtkeydefsCleverSeg = [[resetCS, self.resetCleverSegFlag],
+                                   [runCS, self.runCleverSeg],
+                                   [editSeed, self.editCleverSegSeed]]
 
-            for keydef in self.qtkeydefsCleverSeg:
-                s = qt.QShortcut(keydef[0], slicer.util.mainWindow())  # connect this qt event to mainWindow focus
-                # s.setContext(1)
-                s.connect('activated()', keydef[1])
-                # s.connect('activatedAmbiguously()', keydef[1])
-                self.qtkeyconnections.append(s)
+        for keydef in self.qtkeydefsCleverSeg:
+            s = qt.QShortcut(keydef[0], slicer.util.mainWindow())  # connect this qt event to mainWindow focus
+            # s.setContext(1)
+            s.connect('activated()', keydef[1])
+            # s.connect('activatedAmbiguously()', keydef[1])
+            self.qtkeyconnections.append(s)
 
-            self.CSLabelMod_tag = self.sliceLogic.AddObserver("ModifiedEvent",
-                                                              self.CleverSegChangeLabelInput)  # put test listener on the whole window
+        self.CSLabelMod_tag = self.sliceLogic.AddObserver("ModifiedEvent",
+                                                          self.CleverSegChangeLabelInput)  # put test listener on the whole window
 
-            # fast balanced growth parameters
-            self.bSegmenterInitialized = "no"
-            self.bEditCleverSegSeed = True
-            self.currentMessage = ""
+        # fast balanced growth parameters
+        self.bSegmenterInitialized = "no"
+        self.bEditCleverSegSeed = True
+        self.currentMessage = ""
 
-            seedArray = slicer.util.array(self.labelName)
-            self.CleverSegSeedArray = seedArray.copy()
-            self.CleverSegSegArray = seedArray.copy()
-            self.CleverSegSeedArray[:] = 0
-            self.CleverSegSegArray[:] = 0
+        seedArray = slicer.util.array(self.labelName)
+        self.CleverSegSeedArray = seedArray.copy()
+        self.CleverSegSegArray = seedArray.copy()
+        self.CleverSegSeedArray[:] = 0
+        self.CleverSegSegArray[:] = 0
 
-            import vtkSlicerCleverSegModuleLogicPython
+        import vtkSlicerCleverSegModuleLogicPython
 
-            cleverSegMod = vtkSlicerCleverSegModuleLogicPython.vtkCleverSeg()
+        cleverSegMod = vtkSlicerCleverSegModuleLogicPython.vtkCleverSeg()
 
-            cleverSegMod.SetSourceVol(self.backgroundNode.GetImageData())
-            cleverSegMod.SetSeedVol(self.labelNode.GetImageData())
-            cleverSegMod.Initialization()
-            self.cleverSegMod = cleverSegMod
+        cleverSegMod.SetSourceVol(self.backgroundNode.GetImageData())
+        cleverSegMod.SetSeedVol(self.labelNode.GetImageData())
+        cleverSegMod.Initialization()
+        self.cleverSegMod = cleverSegMod
 
-            self.cleverSegCreated = True  # tracks if completed the initializtion (so can do stop correctly) of KSlice
+        self.cleverSegCreated = True  # tracks if completed the initializtion (so can do stop correctly) of KSlice
 
     def sliceViewMatchEditor(self, sliceLogic):
         # if self.dialogBox==type(None): #something deleted teh dialogBox, this function then breaks, bail
