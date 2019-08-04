@@ -7,7 +7,7 @@ Requires inside and outside annotation
 
 Will be available soon
 
-**Fast and smart segmentation of paraspinal muscles in magnetic resonance imaging with CleverSeg**. *Symposium o Graphics Pattern and Images* (SIBGRAPI2019)
+**Fast and smart segmentation of paraspinal muscles in magnetic resonance imaging with CleverSeg**. *Symposium on Graphics Patterns and Images* (SIBGRAPI2019)
 
 # More details
 
