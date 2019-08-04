@@ -1,4 +1,4 @@
-# SlicerCleverSeg
+# CleverSeg
 
 Semi-automatic segmentation of anatomical structures. 
 Requires inside and outside annotation
