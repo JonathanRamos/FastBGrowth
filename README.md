@@ -24,4 +24,4 @@ Next, click in the CleverSeg icon, then click again in "Start CleverSeg Segmenta
 The results achived is shown in the Figure:
 ![Screenshot03](https://user-images.githubusercontent.com/3834596/62427872-1bf4ed80-b6d0-11e9-886b-043391471ff4.jpg)
 
-Now you can go back and edit seeds or edit the segmentation results using a rubber.
+Now you can go back and edit seeds or edit the segmentation results using the eraser tool.
