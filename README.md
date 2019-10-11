@@ -7,7 +7,7 @@ Requires inside and outside annotation.
 
 First, open 3DSlicer, open a sample MRI example as in the tumor in the example.
 Open de Editor and mark inside and outside spots as in the Figure:
-![Screenshot01](https://user-images.githubusercontent.com/3834596/62427861-e3edaa80-b6cf-11e9-8329-e3f451a1551b.jpg)
+![Screenshot01](https://user-images.githubusercontent.com/3834596/66678882-3fde2d80-ec43-11e9-92bc-00fcb3cee9eb.png)
 
 Next, click in the CleverSeg icon, then click again in "Start CleverSeg Segmentation" and press c to start the segmentation.
 ![Screenshot02](https://user-images.githubusercontent.com/3834596/62427869-0f709500-b6d0-11e9-899f-ee9a8d6c59d1.jpg)
